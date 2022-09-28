@@ -5,7 +5,8 @@
         <img :src="item.img">
       </div>
     </div>
-    <el-button class="begin-button" type="primary" round @click="AudioOn">Start</el-button>
+    <audio ref="GoAudio" :src="GoAudio" loop autoplay></audio>
+    <el-button class="begin-button" type="primary" round @click.once="AudioOn">Start</el-button>
   </div>
 </template>
 
@@ -35,14 +36,29 @@ export default {
         {id:nanoid(),img:r8,name:"r8"},
         {id:nanoid(),img:usp,name:"usp"},
       ],
+      GoAudio
     }
-  },
-  methods:{
-    AudioOn() {
-      let audio = new Audio(GoAudio);
-      audio.play();
+  },methods:{
+    AudioOn(){
+      this.$refs.GoAudio.play();
     }
-  },
+  }
+/*  这个方法自动循环播放不好使
+    methods:{
+    AudioOn(){
+      let musicGo = new Audio(GoAudio);
+      musicGo.onload;
+      musicGo.play();
+    }
+  }*/
+  /*不能直接用定时器去自动播放音频
+  mounted() {
+    setTimeout(()=>{
+      music.src = GoAudio;
+      music.play();
+    })
+  }*/
+
 }
 
 
