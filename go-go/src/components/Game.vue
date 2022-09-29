@@ -6,7 +6,15 @@
       </div>
     </div>
     <audio ref="GoAudio" :src="GoAudio" loop autoplay></audio>
-    <el-button class="begin-button" type="primary" round @click.once="AudioOn">Start</el-button>
+    <transition class="animate__animated animate__pulse" leave-active-class="animate__fadeOut">
+      <el-button
+          ref="button"
+          v-if="buttonExist"
+          class="begin-button"
+          type="primary"
+          @click.once="AudioOn"
+      >Start</el-button>
+    </transition>
   </div>
 </template>
 
@@ -21,6 +29,7 @@ import usp from "../assets/img/usp.png";
 import GoAudio from "../assets/audio/work-hard,play-hard.mp3";
 import nanoid from 'nano-id';
 import { ElButton } from 'element-plus';
+import 'animate.css';
 
 export default {
   name: "Game",
@@ -36,11 +45,13 @@ export default {
         {id:nanoid(),img:r8,name:"r8"},
         {id:nanoid(),img:usp,name:"usp"},
       ],
-      GoAudio
+      GoAudio,
+      buttonExist:true
     }
   },methods:{
     AudioOn(){
       this.$refs.GoAudio.play();
+      this.buttonExist = false;
     }
   }
 /*  这个方法自动循环播放不好使
@@ -90,6 +101,8 @@ export default {
     background: gray;
   }
   .begin-button{
+    position: absolute;
+    top:85%;
     background: linear-gradient(270deg, #3A85F7 0%, #7D1FF9 100%);
     width: 6rem;
     height: 3rem;
