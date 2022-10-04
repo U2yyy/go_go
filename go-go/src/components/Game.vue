@@ -1,7 +1,7 @@
 <template>
   <div class="background-box">
     <div class="game-zone">
-      <div class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
+      <div @click="selected(item,item.id)" class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
         {{item.id}}
         <img :src="item.imgSrc" alt="">
       </div>
@@ -52,13 +52,14 @@ export default {
       this.buttonExist = false;
     },
     initTable(){
+      let num = 1;
       let k = 1;
-      let left = 0;
-      let top = 0;
+      let left = 2;
+      let top = 2;
       for(let i=1;i<=10;i++){
-        left = 0;
+        left = 2;
         for(let j=1;j<=10;j++){
-          let id = (i-1)*10 + j;
+          let id = num++;
           let isExist = false;
           let isCovered = false;
           let index = k;
@@ -68,12 +69,12 @@ export default {
         }
       top += CardHeight;
       }
-      left = 1.5;
-      top = 2;
+      left = 3.5;
+      top = 4;
       for(let i=1;i<=9;i++){
-        left = 1.5;
+        left = 3.5;
         for(let j=1;j<=9;j++){
-          let id = (i-1)*10 + j;
+          let id = num++;
           let isExist = false;
           let isCovered = false;
           let index = k;
@@ -110,6 +111,15 @@ export default {
       let num = 50;
       this.initCard(num);
       this.AudioOn();
+    },
+    selected(item,id){
+      console.log(item)
+      console.log(this.table)
+      this.selectedCards.push(item);
+      console.log(id)
+      this.table = this.table.filter((card)=>{
+        return card !== item;
+      })
     }
   },
   mounted() {
@@ -149,8 +159,8 @@ export default {
   }
   .game-zone {
     position: relative;
-    width: 30rem;
-    height: 40rem;
+    width: 34rem;
+    height: 44rem;
     background-color:transparent;
     border: #FFCC99 solid 0.2rem;
     border-radius: 2rem;
@@ -161,7 +171,7 @@ export default {
     height: 4rem;
     border-radius: 0.2rem;
     border: pink solid 0.1rem;
-    background: transparent;
+    background: yellowgreen;
   }
   .begin-button{
     position: absolute;
