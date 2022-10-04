@@ -28,7 +28,7 @@ import p250 from "../assets/img/p250.png";
 import r8 from "../assets/img/r8.png";
 import usp from "../assets/img/usp.png";
 import GoAudio from "../assets/audio/work-hard,play-hard.mp3";
-import { ElButton } from 'element-plus';
+import {store} from "@/store";
 import 'animate.css';
 
 const CardWidth = 3;
@@ -36,15 +36,15 @@ const CardHeight = 4;
 
 export default {
   name: "Game",
-  components: { ElButton },
+  components: {},
   data(){
     return {
       img:[ak47,awp,eagle,m4a1,p250,r8,usp],
       table:[],
       cards:[],
-      selectedCards:[],
       GoAudio,
       buttonExist:true,
+      store
     }
   },methods:{
     AudioOn(){
@@ -115,7 +115,7 @@ export default {
     selected(item,id){
       console.log(item)
       console.log(this.table)
-      this.selectedCards.push(item);
+      this.store.selectedCards.push(item);
       console.log(id)
       this.table = this.table.filter((card)=>{
         return card !== item;
