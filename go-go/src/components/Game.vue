@@ -96,13 +96,8 @@ export default {
         card.clickable = true;
       })
     },
-    selected(item,id,clickable){
-      if(!clickable)
-        return;
-      console.log(item)
-      console.log(this.table)
+    insert(item){
       let index;
-      /*判断插入位置，进行插入卡片操作*/
       for(let i=0;i<this.store.selectedCards.length || this.store.selectedCards.length === 0;i++){
         if(i === this.store.selectedCards.length - 1 || this.store.selectedCards.length === 0){
           this.store.selectedCards.push(item);
@@ -114,19 +109,17 @@ export default {
           break;
         }
       }
-      /*删除在表上的卡片*/
-      console.log(id)
-      this.table = this.table.filter((card)=>{
-        return card !== item;
-      })
-      /*判断是否消除*/
+      return index;
+    },
+    removeArr(item,index){
       let tempArr = this.store.selectedCards.filter((card)=>{
         return card === item;
       })
       if(tempArr.length === 3){
         this.store.selectedCards.splice(index,3);
       }
-      /*判断游戏是否输掉*/
+    },
+    GameOver(){
       if(this.store.selectedCards.length >= 7){
         setTimeout(()=>{
           alert("Game Over!")
@@ -135,6 +128,23 @@ export default {
           card.clickable = false;
         })
       }
+    },
+    selected(item,id,clickable){
+      if(!clickable)
+        return;
+      console.log(item)
+      console.log(this.table)
+      /*判断插入位置，进行插入卡片操作*/
+      let index = this.insert(item);
+      /*删除在表上的卡片*/
+      console.log(id)
+      this.table = this.table.filter((card)=>{
+        return card !== item;
+      })
+      /*判断是否消除*/
+      this.removeArr(item,index);
+      /*判断游戏是否输掉*/
+      this.GameOver();
     }
   },
   mounted() {
