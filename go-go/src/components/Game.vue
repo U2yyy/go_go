@@ -2,8 +2,7 @@
   <div class="background-box">
     <div class="game-zone">
       <div @click="selected(item,item.id,item.clickable)" class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
-        {{item.id}}
-        <img :src="item.imgSrc" alt="">
+        <img v-if="item.imgSrc !== ''" :src="item.imgSrc" alt="">
       </div>
     </div>
     <audio ref="GoAudio" :src="GoAudio" loop autoplay></audio>
@@ -34,6 +33,11 @@ import 'animate.css';
 const CardWidth = 3;
 const CardHeight = 4;
 
+const indexArr = [];
+for(let i=0;i<181;i++){
+  indexArr.push(i);
+}
+
 export default {
   name: "Game",
   components: {},
@@ -46,7 +50,8 @@ export default {
       buttonExist:true,
       store
     }
-  },methods:{
+  },
+  methods:{
     AudioOn(){
       this.$refs.GoAudio.play();
       this.buttonExist = false;
@@ -85,8 +90,20 @@ export default {
         top += CardHeight;
       }
     },
-    initCard: function (num) {
+    initCard: function () {
       console.log("Game Start");
+      let num = 0;
+      indexArr.sort(()=>Math.random() - 0.5);
+      while(num < 181){
+        let imgIndex = Math.floor(Math.random()*7);
+        let imgSrc = this.img[imgIndex];
+        for (let i = 0; i < 3; i++) {
+          if (num < 181) {
+            this.table[indexArr[num]].imgSrc = imgSrc;
+            num++;
+          }
+        }
+      }
     },
     GameStart(){
       let num = 50;
@@ -98,14 +115,16 @@ export default {
     },
     insert(item){
       let index;
+      /*这里的length使加入之前的length所以只-1不-2，还是挺坑的，逻辑陷阱吧算是*/
       for(let i=0;i<this.store.selectedCards.length || this.store.selectedCards.length === 0;i++){
         if(i === this.store.selectedCards.length - 1 || this.store.selectedCards.length === 0){
+          index = this.store.selectedCards.length - 2;
           this.store.selectedCards.push(item);
           break;
         }
         if(this.store.selectedCards[i].imgSrc === item.imgSrc && this.store.selectedCards[i+1].imgSrc !== item.imgSrc){
-          index = i-2;
-          this.store.selectedCards.splice(i+1,1,item);
+          index = i-1;
+          this.store.selectedCards.splice(i+1,0,item);
           break;
         }
       }
@@ -113,10 +132,13 @@ export default {
     },
     removeArr(item,index){
       let tempArr = this.store.selectedCards.filter((card)=>{
-        return card === item;
+        return card.imgSrc === item.imgSrc;
       })
+      console.log(tempArr);
       if(tempArr.length === 3){
-        this.store.selectedCards.splice(index,3);
+        setTimeout(()=>{
+          this.store.selectedCards.splice(index, 3);
+        },100)
       }
     },
     GameOver(){
@@ -129,22 +151,32 @@ export default {
         })
       }
     },
+    GameWin(){
+      if(this.table.length === 0){
+        alert("You win!");
+      }
+    },
     selected(item,id,clickable){
       if(!clickable)
         return;
-      console.log(item)
-      console.log(this.table)
+/*      console.log(item)
+      console.log(this.table)*/
       /*判断插入位置，进行插入卡片操作*/
       let index = this.insert(item);
+      console.log(index);
       /*删除在表上的卡片*/
-      console.log(id)
+/*      console.log(id)*/
       this.table = this.table.filter((card)=>{
         return card !== item;
       })
       /*判断是否消除*/
       this.removeArr(item,index);
       /*判断游戏是否输掉*/
-      this.GameOver();
+      setTimeout(()=>{
+        this.GameOver();
+      },100);
+      /*判断游戏是否胜利*/
+      this.GameWin();
     }
   },
   mounted() {
@@ -165,13 +197,12 @@ export default {
       music.play();
     })
   }*/
-
 }
 
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .background-box {
     width: 100%;
     height: calc(100vh);
@@ -195,8 +226,11 @@ export default {
     width: 3rem;
     height: 4rem;
     border-radius: 0.2rem;
-    border: pink solid 0.1rem;
-    background: yellowgreen;
+    background: #828a82;
+    box-shadow: 0 0 0 1px #625353;
+    & :hover{
+      background: #98a198;
+    }
   }
   .begin-button{
     position: absolute;
@@ -210,11 +244,6 @@ export default {
     font-size: 2rem;
     font-style: italic;
     color: rgba(255, 255, 255, 0.3);
-  }
-  .begin-button:active{
-    background: rgba(125, 31, 249, 1);;
-  }
-  .begin-button:hover{
     cursor: pointer;
   }
   img {

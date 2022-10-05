@@ -1,13 +1,16 @@
 <template>
   <div class="selection">
-    <div v-for="item in store.selectedCards" :key = item.id class="card">
-
-    </div>
+    <transition-group name="card">
+      <div v-for="item in store.selectedCards" :key = item.id class="card">
+        <img :src="item.imgSrc" alt="">
+      </div>
+    </transition-group>
   </div>
 </template>
 
 <script>
 import {store} from "@/store";
+
 export default {
   name: "ClearBox",
   data(){
@@ -21,19 +24,38 @@ export default {
 <style scoped>
   .selection{
     height: 4rem;
-    background: #3A85F7;
-    border: 1px solid gold;
+    background: transparent;
+    box-shadow: 0 0 0 1px blanchedalmond;
     position: fixed;
-    left: 40%;
+    left: 41%;
     bottom: 1rem;
-    width: 22.4rem;
+    width: 21rem;
   }
   .card{
+    background: #828a82;
+    box-shadow: 0 0 0 1px #625353;
     display: inline-block;
     width: 3rem;
     height: 4rem;
-    border-radius: 0.2rem;
-    border: pink solid 0.1rem;
-    background: yellowgreen;
+  }
+  img {
+    width: 3rem;
+    height: 4rem;
+  }
+  .card-move,
+  .card-enter-active,
+  .card-leave-active {
+    transition: all 0.5s ease;
+  }
+  .card-enter-from{
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  .card-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  .list-leave-active {
+    position: absolute;
   }
 </style>
