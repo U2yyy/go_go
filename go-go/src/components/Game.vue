@@ -1,7 +1,7 @@
 <template>
   <div class="background-box">
     <div class="game-zone">
-      <div @click="selected(item,item.id)" class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
+      <div @click="selected(item,item.id,item.clickable)" class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
         {{item.id}}
         <img :src="item.imgSrc" alt="">
       </div>
@@ -61,10 +61,10 @@ export default {
         for(let j=1;j<=10;j++){
           let id = num++;
           let isExist = false;
-          let isCovered = false;
           let index = k;
           let imgSrc ='';
-          this.table.push({id,index,isCovered,isExist,imgSrc,left:left+'rem',top:top+'rem'});
+          let clickable = false;
+          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'rem',top:top+'rem'});
           left += CardWidth;
         }
       top += CardHeight;
@@ -76,50 +76,65 @@ export default {
         for(let j=1;j<=9;j++){
           let id = num++;
           let isExist = false;
-          let isCovered = false;
           let index = k;
           let imgSrc ='';
-          this.table.push({id,index,isCovered,isExist,imgSrc,left:left+'rem',top:top+'rem'});
+          let clickable = false;
+          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'rem',top:top+'rem'});
           left += CardWidth;
         }
         top += CardHeight;
       }
     },
     initCard: function (num) {
-      while (num >= 0) {
-        for (let n = 0; n < 3; n++) {
-          let imgNum = Math.floor(Math.random() * 8), imgSrc = this.img[imgNum], i = Math.floor(Math.random() * 2) + 1,
-              j, tar;
-          do {
-            if (i % 2 === 0) {
-              j = Math.floor(Math.random() * 81) + 1;
-            } else {
-              j = Math.floor(Math.random() * 100) + 1;
-            }
-            tar = this.table.find(({id, index}) => {
-              return (id === j && index === i);
-            })
-            console.log(tar);
-          } while (tar.isExist)
-          tar.isExist = true;
-          tar.imgSrc = imgSrc;
-        }
-        num--;
-      }
+      console.log("Game Start");
     },
     GameStart(){
       let num = 50;
       this.initCard(num);
       this.AudioOn();
+      this.table.forEach((card)=>{
+        card.clickable = true;
+      })
     },
-    selected(item,id){
+    selected(item,id,clickable){
+      if(!clickable)
+        return;
       console.log(item)
       console.log(this.table)
-      this.store.selectedCards.push(item);
+      let index;
+      /*判断插入位置，进行插入卡片操作*/
+      for(let i=0;i<this.store.selectedCards.length || this.store.selectedCards.length === 0;i++){
+        if(i === this.store.selectedCards.length - 1 || this.store.selectedCards.length === 0){
+          this.store.selectedCards.push(item);
+          break;
+        }
+        if(this.store.selectedCards[i].imgSrc === item.imgSrc && this.store.selectedCards[i+1].imgSrc !== item.imgSrc){
+          index = i-2;
+          this.store.selectedCards.splice(i+1,1,item);
+          break;
+        }
+      }
+      /*删除在表上的卡片*/
       console.log(id)
       this.table = this.table.filter((card)=>{
         return card !== item;
       })
+      /*判断是否消除*/
+      let tempArr = this.store.selectedCards.filter((card)=>{
+        return card === item;
+      })
+      if(tempArr.length === 3){
+        this.store.selectedCards.splice(index,3);
+      }
+      /*判断游戏是否输掉*/
+      if(this.store.selectedCards.length >= 7){
+        setTimeout(()=>{
+          alert("Game Over!")
+        },100)
+        this.table.forEach((card)=>{
+          card.clickable = false;
+        })
+      }
     }
   },
   mounted() {
