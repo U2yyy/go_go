@@ -1,11 +1,23 @@
 <template>
-  <div class="selection">
-    <transition-group name="card">
-      <div v-for="item in store.selectedCards" :key = item.id class="card">
-        <img :src="item.imgSrc" alt="">
+  <el-row>
+    <el-col :xs="0" :sm="5" :md="7" :lg="8" :xl="8">
+      <div class="grid-content blank"></div>
+    </el-col>
+    <el-col :xs="24" :sm="14" :md="10" :lg="8" :xl="8">
+      <div class="grid-content center-bar">
+       <div v-if="store.gameBegin" class="selection">
+        <transition-group name="card">
+          <div v-for="item in store.selectedCards" :key = item.id class="card">
+            <img :src="item.imgSrc" alt="">
+          </div>
+        </transition-group>
       </div>
-    </transition-group>
-  </div>
+      </div>
+    </el-col>
+    <el-col :xs="0" :sm="5" :md="7" :lg="8" :xl="8">
+      <div class="grid-content blank"></div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -23,24 +35,22 @@ export default {
 
 <style scoped>
   .selection{
-    height: 4rem;
     background: transparent;
     box-shadow: 0 0 0 1px blanchedalmond;
-    position: fixed;
-    left: 41%;
-    bottom: 1rem;
-    width: 21rem;
+    margin: 0.5rem auto;
+    width: 80%;
+    height: 8vh;
   }
   .card{
-    background: #828a82;
-    box-shadow: 0 0 0 1px #625353;
+    background: #e3e3e3;
+    box-shadow: 0 0 0 2px #888888;
     display: inline-block;
-    width: 3rem;
-    height: 4rem;
+    width: 14.2%;
+    height: 8vh;
   }
   img {
-    width: 3rem;
-    height: 4rem;
+    width: 100%;
+    height: 8vh;
   }
   .card-move,
   .card-enter-active,

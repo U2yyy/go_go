@@ -1,24 +1,45 @@
 <template>
   <div class="background-box">
-    <div class="game-zone">
-      <div @click="selected(item,item.id,item.clickable)" class="card" v-for="item in table" :key="item.id" :style="{left: item.left,top: item.top}">
-        <img v-if="item.imgSrc !== ''" :src="item.imgSrc" alt="">
-      </div>
-    </div>
-    <audio ref="GoAudio" :src="GoAudio" loop autoplay></audio>
-    <transition class="animate__animated animate__pulse" leave-active-class="animate__fadeOut">
-      <el-button
-          ref="button"
-          v-if="buttonExist"
-          class="begin-button"
-          type="primary"
-          @click.once="GameStart"
-      >Start</el-button>
-    </transition>
+    <img :src="backgroundImg" style="position:fixed;top:0;right:0;width: 100vw;height: 100vh;z-index:-3">
+    <el-row>
+      <el-col :xs="0" :sm="5" :md="7" :lg="8" :xl="8">
+        <div class="grid-content blank"></div>
+      </el-col>
+      <el-col :xs="24" :sm="14" :md="10" :lg="8" :xl="8">
+        <div class="grid-content center-bar">
+          <div v-if="store.gameBegin" class="game-zone">
+            <div @click="selected(item,item.id,item.clickable)" class="card" v-for="item in existedCards" :key="item.id" :style="{left: item.left,top: item.top}">
+              <img v-if="item.imgSrc !== ''" :src="item.imgSrc" alt="">
+            </div>
+          </div>
+          <audio ref="GoAudio" :src="GoAudio" loop autoplay></audio>
+          <div v-if="!store.gameBegin" class="selection">
+            <el-radio-group v-model="level" size="large">
+              <el-radio-button label="简单" />
+              <el-radio-button label="普通" />
+              <el-radio-button label="困难" />
+            </el-radio-group>
+          </div>
+          <transition class="animate__animated animate__pulse" leave-active-class="animate__fadeOut">
+            <button
+                ref="button"
+                v-if="buttonExist"
+                class="begin-button"
+                type="primary"
+                @click.once="GameStart"
+            >Start</button>
+          </transition>
+        </div>
+      </el-col>
+      <el-col :xs="0" :sm="5" :md="7" :lg="8" :xl="8">
+        <div class="grid-content blank"></div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
+import backgroundImg from "../assets/img/csbg.jpg";
 import ak47 from "../assets/img/ak47.png";
 import awp from "../assets/img/awp.png";
 import eagle from "../assets/img/eagle.png";
@@ -30,11 +51,11 @@ import GoAudio from "../assets/audio/work-hard,play-hard.mp3";
 import {store} from "@/store";
 import 'animate.css';
 
-const CardWidth = 3;
-const CardHeight = 4;
+const CardWidth = 14;
+const CardHeight = 12;
 
 const indexArr = [];
-for(let i=0;i<181;i++){
+for(let i=0;i<80;i++){
   indexArr.push(i);
 }
 
@@ -44,11 +65,13 @@ export default {
   data(){
     return {
       img:[ak47,awp,eagle,m4a1,p250,r8,usp],
+      backgroundImg,
       table:[],
       cards:[],
       GoAudio,
       buttonExist:true,
-      store
+      store,
+      level:1,
     }
   },
   methods:{
@@ -59,59 +82,68 @@ export default {
     initTable(){
       let num = 1;
       let k = 1;
-      let left = 2;
+      let left = 1;
       let top = 2;
-      for(let i=1;i<=10;i++){
-        left = 2;
-        for(let j=1;j<=10;j++){
+      for(let i=1;i<=7;i++){
+        left = 1;
+        for(let j=1;j<=7;j++){
           let id = num++;
           let isExist = false;
           let index = k;
           let imgSrc ='';
           let clickable = false;
-          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'rem',top:top+'rem'});
+          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'%',top:top+'vh'});
           left += CardWidth;
         }
       top += CardHeight;
       }
-      left = 3.5;
-      top = 4;
-      for(let i=1;i<=9;i++){
-        left = 3.5;
-        for(let j=1;j<=9;j++){
+      left = 8;
+      top = 8;
+      for(let i=1;i<=6;i++){
+        left = 8;
+        for(let j=1;j<=6;j++){
           let id = num++;
           let isExist = false;
           let index = k;
           let imgSrc ='';
           let clickable = false;
-          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'rem',top:top+'rem'});
+          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'%',top:top+'vh'});
           left += CardWidth;
         }
         top += CardHeight;
       }
     },
-    initCard: function () {
+    initCard(level) {
+      let cardNum = level*24;
       console.log("Game Start");
       let num = 0;
       indexArr.sort(()=>Math.random() - 0.5);
-      while(num < 181){
+      while(num < cardNum){
         let imgIndex = Math.floor(Math.random()*7);
         let imgSrc = this.img[imgIndex];
         for (let i = 0; i < 3; i++) {
-          if (num < 181) {
+          if (num < cardNum) {
             this.table[indexArr[num]].imgSrc = imgSrc;
+            this.table[indexArr[num]].isExist = true;
             num++;
           }
         }
       }
     },
     GameStart(){
-      let num = 50;
-      this.initCard(num);
+      let GameLevel;
+      switch (this.level){
+        case "简单": GameLevel = 1;break;
+        case "普通": GameLevel = 2;break;
+        case "困难": GameLevel = 3;break;
+        default:break;
+      }
+      this.initCard(GameLevel);
       this.AudioOn();
       this.table.forEach((card)=>{
         card.clickable = true;
-      })
+      });
+      this.store.gameBegin = true;
     },
     insert(item){
       let index;
@@ -145,15 +177,17 @@ export default {
       if(this.store.selectedCards.length >= 7){
         setTimeout(()=>{
           alert("Game Over!")
-        },100)
+        },100);
         this.table.forEach((card)=>{
           card.clickable = false;
-        })
+        });
       }
     },
     GameWin(){
-      if(this.table.length === 0){
-        alert("You win!");
+      if(this.existedCards.length === 0){
+        setTimeout(()=>{
+          alert("You win!");
+        },100);
       }
     },
     selected(item,id,clickable){
@@ -176,7 +210,16 @@ export default {
         this.GameOver();
       },100);
       /*判断游戏是否胜利*/
-      this.GameWin();
+      setTimeout(()=>{
+        this.GameWin();
+      },100);
+    }
+  },
+  computed:{
+    existedCards(){
+      return this.table.filter((card)=>{
+        return card.isExist === true;
+      })
     }
   },
   mounted() {
@@ -203,40 +246,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .background-box {
-    width: 100%;
-    height: calc(100vh);
-    background: url("https://images4.alphacoders.com/347/34758.jpg");
-    background-size:cover;
-    marin: 0 auto;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-  }
   .game-zone {
     position: relative;
-    width: 34rem;
-    height: 44rem;
+    box-sizing: border-box;
+    width: 100%;
+    height: 88vh;
     background-color:transparent;
     border: #FFCC99 solid 0.2rem;
     border-radius: 2rem;
   }
   .card {
     position: absolute;
-    width: 3rem;
-    height: 4rem;
+    width: 14%;
+    height: 12vh;
     border-radius: 0.2rem;
-    background: #828a82;
-    box-shadow: 0 0 0 1px #625353;
+    background: #e3e3e3;
+    box-shadow: 0 0 0 2px #888888;
     & :hover{
-      background: #98a198;
+      background: #ffffff;
     }
   }
   .begin-button{
-    position: absolute;
-    top:85%;
     background: linear-gradient(270deg, #3A85F7 0%, #7D1FF9 100%);
-    width: 6rem;
+    margin-left: 27.5%;
+    width: 45%;
     height: 3rem;
     border-style: none;
     border-radius: 0.5rem;
@@ -247,7 +280,24 @@ export default {
     cursor: pointer;
   }
   img {
-    width: 3rem;
-    height: 4rem;
+    width: 100%;
+    height: 12vh;
+  }
+  .selection{
+    width: 100%;
+    text-align: center;
+    margin: 50vh auto 0;
+  }
+  .radioBox input{
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background-color: #fff;
+    border: 1px solid #c9c9c9;
+    border-radius: 50%;
+    outline: none;
+    margin-right: 22px;
+    cursor: pointer;
   }
 </style>
