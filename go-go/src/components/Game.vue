@@ -20,7 +20,6 @@
               <el-radio-button label="困难" />
             </el-radio-group>
           </div>
-          <transition class="animate__animated animate__pulse" leave-active-class="animate__fadeOut">
             <button
                 ref="button"
                 v-if="buttonExist"
@@ -28,7 +27,6 @@
                 type="primary"
                 @click.once="GameStart"
             >Start</button>
-          </transition>
         </div>
       </el-col>
       <el-col :xs="0" :sm="5" :md="7" :lg="8" :xl="8">

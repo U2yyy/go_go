@@ -9,8 +9,13 @@ import ClearBox from "@/components/ClearBox.vue";
 </template>
 
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-  }
+
+html, body {
+  height: 100%;
+  overflow: auto;
+  margin: 0;
+}
+html {
+  overflow-y: auto;
+}
 </style>

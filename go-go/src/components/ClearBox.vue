@@ -59,11 +59,11 @@ export default {
   }
   .card-enter-from{
     opacity: 0;
-    transform: translateY(-30px);
+    transform: translateY(-10px);
   }
   .card-leave-to {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(10px);
   }
   .list-leave-active {
     position: absolute;
