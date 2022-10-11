@@ -8,7 +8,7 @@
       <el-col :xs="24" :sm="14" :md="10" :lg="8" :xl="8">
         <div class="grid-content center-bar">
           <div v-if="store.gameBegin" class="game-zone">
-            <div @click="selected(item,item.id,item.clickable)" class="card" v-for="item in existedCards" :key="item.id" :style="{left: item.left,top: item.top}">
+            <div @click="selected(item,item.id,item.clickable)" :class="{'card':true,'covered':!item.clickable}" v-for="item in existedCards" :key="item.id" :style="{left: item.left + '%',top: item.top +'vh'}">
               <img v-if="item.imgSrc !== ''" :src="item.imgSrc" alt="">
             </div>
           </div>
@@ -49,11 +49,23 @@ import GoAudio from "../assets/audio/work-hard,play-hard.mp3";
 import {store} from "@/store";
 import 'animate.css';
 
+class table{
+  constructor(id,index,clickable,isExist,imgSrc,left,top) {
+    this.id = id;
+    this.index = index;
+    this.clickable = clickable;
+    this.isExist = isExist;
+    this.imgSrc = imgSrc;
+    this.left = left;
+    this.top = top;
+  }
+}
+
 const CardWidth = 14;
 const CardHeight = 12;
 
 const indexArr = [];
-for(let i=0;i<80;i++){
+for(let i=0;i<170;i++){
   indexArr.push(i);
 }
 
@@ -65,9 +77,8 @@ export default {
       img:[ak47,awp,eagle,m4a1,p250,r8,usp],
       backgroundImg,
       table:[],
-      cards:[],
-      GoAudio,
       buttonExist:true,
+      GoAudio,
       store,
       level:1,
     }
@@ -90,13 +101,14 @@ export default {
           let index = k;
           let imgSrc ='';
           let clickable = false;
-          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'%',top:top+'vh'});
+          this.table.push(new table(id,index,clickable,isExist,imgSrc,left,top));
           left += CardWidth;
         }
       top += CardHeight;
       }
       left = 8;
       top = 8;
+      k++;
       for(let i=1;i<=6;i++){
         left = 8;
         for(let j=1;j<=6;j++){
@@ -105,14 +117,66 @@ export default {
           let index = k;
           let imgSrc ='';
           let clickable = false;
-          this.table.push({id,index,clickable,isExist,imgSrc,left:left+'%',top:top+'vh'});
+          this.table.push(new table(id,index,clickable,isExist,imgSrc,left,top));
+          left += CardWidth;
+        }
+        top += CardHeight;
+      }
+      k++;
+      top = 2;
+      for(let i=1;i<=7;i++){
+        left = 1;
+        for(let j=1;j<=7;j++){
+          let id = num++;
+          let isExist = false;
+          let index = k;
+          let imgSrc ='';
+          let clickable = false;
+          this.table.push(new table(id,index,clickable,isExist,imgSrc,left,top));
+          left += CardWidth;
+        }
+        top += CardHeight;
+      }
+      left = 8;
+      top = 8;
+      k++;
+      for(let i=1;i<=6;i++){
+        left = 8;
+        for(let j=1;j<=6;j++){
+          let id = num++;
+          let isExist = false;
+          let index = k;
+          let imgSrc ='';
+          let clickable = false;
+          this.table.push(new table(id,index,clickable,isExist,imgSrc,left,top));
           left += CardWidth;
         }
         top += CardHeight;
       }
     },
+    isCovered(){
+      this.table.forEach((card)=>{
+          if(card.isExist && card.index < 4){
+            for (const cardKey in this.table){
+              if(this.table[cardKey].isExist && this.table[cardKey].index > card.index){
+                let width = this.table[cardKey].left - card.left;
+                width = width > 0 ? width : -width;
+                let height = this.table[cardKey].top - card.top;
+                height = height > 0 ? height : -height;
+                console.log(width,height)
+                if(width < CardWidth && height < CardHeight){
+                  card.clickable = false;
+                  break;
+                }else{
+                  card.clickable = true;
+                }
+              }
+            }
+          }
+        })
+    },
     initCard(level) {
-      let cardNum = level*24;
+      let cardNum = level*54;
       console.log("Game Start");
       let num = 0;
       indexArr.sort(()=>Math.random() - 0.5);
@@ -127,6 +191,12 @@ export default {
           }
         }
       }
+      console.log(this.table);
+      this.table.forEach((card)=>{
+        if(card.isExist)
+          card.clickable = true;
+      });
+      this.isCovered();
     },
     GameStart(){
       let GameLevel;
@@ -138,9 +208,6 @@ export default {
       }
       this.initCard(GameLevel);
       this.AudioOn();
-      this.table.forEach((card)=>{
-        card.clickable = true;
-      });
       this.store.gameBegin = true;
     },
     insert(item){
@@ -201,6 +268,8 @@ export default {
       this.table = this.table.filter((card)=>{
         return card !== item;
       })
+      /*动态判断卡片是否被覆盖*/
+      this.isCovered();
       /*判断是否消除*/
       this.removeArr(item,index);
       /*判断游戏是否输掉*/
@@ -264,6 +333,12 @@ export default {
       background: #ffffff;
     }
   }
+  .covered{
+    background: #b9b7b7;
+    & :hover{
+      background: #b9b7b7;
+    }
+  }
   .begin-button{
     background: linear-gradient(270deg, #3A85F7 0%, #7D1FF9 100%);
     margin-left: 27.5%;
@@ -277,7 +352,7 @@ export default {
     color: rgba(255, 255, 255, 0.3);
     cursor: pointer;
   }
-  img {
+   img {
     width: 100%;
     height: 12vh;
   }
