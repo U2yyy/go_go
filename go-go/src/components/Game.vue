@@ -212,7 +212,7 @@ export default {
     },
     insert(item){
       let index;
-      /*这里的length使加入之前的length所以只-1不-2，还是挺坑的，逻辑陷阱吧算是*/
+      /*这里的length是加入之前的length所以只-1不-2，还是挺坑的，逻辑陷阱吧算是*/
       for(let i=0;i<this.store.selectedCards.length || this.store.selectedCards.length === 0;i++){
         if(i === this.store.selectedCards.length - 1 || this.store.selectedCards.length === 0){
           index = this.store.selectedCards.length - 2;
